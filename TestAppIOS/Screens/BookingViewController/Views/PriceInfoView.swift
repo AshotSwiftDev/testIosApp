@@ -78,10 +78,8 @@ class PriceInfoView: UIView {
     }
     
     private func setupUI() {
-        
         self.backgroundColor = .white
         self.layer.cornerRadius = 15
-        
         self.addSubview(tourLabel)
         self.addSubview(tourInfoLabel)
         self.addSubview(fuelSurchargeLabel)

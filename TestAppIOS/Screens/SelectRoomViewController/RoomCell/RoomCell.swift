@@ -10,9 +10,11 @@ import UIKit
 class RoomCell: UITableViewCell {
     
     var isSelectedCell: (() -> Void)?
+    var moreButtonSend: (() -> Void)?
     
     static var identifier = "RoomView"
-    var cellBackgroundView = UIView()
+    private var cellBackgroundView = UIView()
+    
     lazy private var roomImage: UIImageView = {
         var imageView = UIImageView()
         imageView.layer.cornerRadius = 15
@@ -67,6 +69,7 @@ class RoomCell: UITableViewCell {
         button.setImage(UIImage(named: "chevron_button_right_icon"), for: .normal)
         button.imagePosition(position: .right, spacing: 12)
         button.layer.cornerRadius = 5
+        button.addTarget(self, action: #selector(moreButtonAction), for: .touchUpInside)
         return button
     }()
     
@@ -174,7 +177,6 @@ class RoomCell: UITableViewCell {
     }
     
     func setupData(model: RoomlModel){
-        
         self.roomImage.image = UIImage(named: model.image)
         self.typeLabel.text = model.type
         self.allInclusiveLabel.text = model.allInclusive
@@ -185,5 +187,9 @@ class RoomCell: UITableViewCell {
     
     @objc private func selectAction() {
         isSelectedCell?()
+    }
+    
+    @objc private func moreButtonAction() {
+        moreButtonSend?()
     }
 }

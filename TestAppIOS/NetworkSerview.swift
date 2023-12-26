@@ -13,7 +13,7 @@ class FetchHotel {
 
     private var hotelModel = [
         HotelModel(
-            image: "hotel_image1",
+            image: "hotel_image_1",
             rating: "5 Превосходно",
             name: "Steigenberger Makadi",
             description: "Madinat Makadi, Safaga Road, Makadi Bay, Египет",
@@ -26,7 +26,7 @@ class FetchHotel {
             hotelInfo: "Отель VIP-класса с собственными гольф полями. Высокий уровень сервиса. Рекомендуем для респектабельного отдыха. Отель принимает гостей от 18 лет!",
             room: [
                 RoomlModel(
-                    image: "hotel_image1",
+                    image: "room_image_1",
                     type: "Стандартный с видом на бассейн или сад",
                     allInclusive: "Все включено",
                     option: "Кондиционер",
@@ -34,11 +34,11 @@ class FetchHotel {
                     conditions: "за 7 ночей с перелётом"
                 ),
                 RoomlModel(
-                    image: "hotel_image1",
+                    image: "room_image_2",
                     type: "Стандартный с видом на бассейн или сад",
                     allInclusive: "Все включено",
                     option: "Кондиционер",
-                    price: "186 600",
+                    price: "135 300",
                     conditions: "за 7 ночей с перелётом"
                 )
             ]

@@ -7,7 +7,7 @@
 
 import UIKit
 
-class BuyerInformationView: UIView {
+class SectionView: UIView {
     
     private var isHiddenStackView = false {
         didSet {

@@ -78,6 +78,11 @@ extension SelectRoomViewController: UITableViewDataSource {
             let bookingViewController = BookingViewController()
             self?.navigationController?.pushViewController(bookingViewController, animated: true)
         }
+        
+        cell?.moreButtonSend = { [weak self] in
+            print("moreButtonAction")
+        }
+        
         return cell ?? UITableViewCell()
     }
 }

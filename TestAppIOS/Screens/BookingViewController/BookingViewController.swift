@@ -10,10 +10,13 @@ import SnapKit
 
 class BookingViewController: UIViewController {
     
+   private var index = 0
+   private let tourists = ["Первый турист", "Второй турист", "Третый турист", "Четвертый турист", "Пятый турист", "Шестой турист", "Седьмой турист", "восьмой турист", "Девятый турист", "десятый турист"]
+    
     private var bookingModel = FetchBooking.shared.getBookingList()
     private var ratingView = RatingView()
     private var flightInformationView = FlightInformationView()
-    private var buyerInformationView = BuyerInformationView()
+    private var sectionView = SectionView()
     private var priceInfoView = PriceInfoView()
     private var scrollViewBottomConstraint: Constraint?
     
@@ -28,6 +31,14 @@ class BookingViewController: UIViewController {
         let view = UIView()
         view.backgroundColor = .white
         return view
+    }()
+    
+    lazy private var stackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.spacing = 8
+        stackView.axis = .vertical
+        return stackView
+        
     }()
     
     lazy private var payButton: UIButton = {
@@ -77,12 +88,13 @@ class BookingViewController: UIViewController {
         self.view.addSubview(payButtonBackgroundView)
         self.scrollView.addSubview(ratingView)
         self.scrollView.addSubview(flightInformationView)
-        self.scrollView.addSubview(buyerInformationView)
+        self.scrollView.addSubview(stackView)
         self.scrollView.addSubview(priceInfoView)
         self.scrollView.addSubview(addBayerButtonBackgroundView)
         self.addBayerButtonBackgroundView.addSubview(addBayerButton)
         self.addBayerButtonBackgroundView.addSubview(addBayerLabel)
         self.payButtonBackgroundView.addSubview(payButton)
+        stackView.addArrangedSubview(sectionView)
         
         scrollView.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
@@ -103,14 +115,14 @@ class BookingViewController: UIViewController {
             make.right.equalTo(view.snp.right)
         }
         
-        buyerInformationView.snp.makeConstraints { make in
+        stackView.snp.makeConstraints { make in
             make.top.equalTo(flightInformationView.snp.bottom).inset(-8)
             make.left.equalTo(view.snp.left)
             make.right.equalTo(view.snp.right)
         }
         
         addBayerButtonBackgroundView.snp.makeConstraints { make in
-            make.top.equalTo(buyerInformationView.snp.bottom).inset(-8)
+            make.top.equalTo(stackView.snp.bottom).inset(-8)
             make.left.equalTo(view.snp.left)
             make.right.equalTo(view.snp.right)
             make.height.equalTo(58)
@@ -155,7 +167,7 @@ class BookingViewController: UIViewController {
         flightInformationView.setupData(model: bookingModel)
         priceInfoView.setupData(model: bookingModel)
         registerKeyboardNotification()
-        buyerInformationView.setupData(title: "Первый турист")
+        sectionView.setupData(title: "Первый турист")
         
         self.payButton.setTitle("Оплатить \(bookingModel.tourInfo)", for: .normal)
     }
@@ -192,7 +204,17 @@ class BookingViewController: UIViewController {
     }
     
     @objc private func addBayerAction() {
-        print("addBayer")
+ 
+        self.index += 1
+        if index < tourists.count {
+            let sectionView = SectionView()
+            sectionView.setupData(title: tourists[self.index])
+            self.stackView.addArrangedSubview(sectionView)
+        }
+        if index == tourists.endIndex - 1 {
+            self.addBayerButton.isEnabled = true
+            self.addBayerButton.backgroundColor = .buttonBackground
+        }
     }
     
     @objc private func keyboardWillShow(notification: Notification) {
@@ -216,7 +238,7 @@ class BookingViewController: UIViewController {
 
 extension BookingViewController: UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
-        scrollView.setContentOffset(CGPoint(x: 0, y: buyerInformationView.frame.origin.y - scrollView.contentInset.top), animated: true)
+        scrollView.setContentOffset(CGPoint(x: 0, y: stackView.frame.origin.y - scrollView.contentInset.top), animated: true)
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
