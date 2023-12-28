@@ -9,6 +9,7 @@ import UIKit
 
 class PaidViewController: UIViewController {
     
+    //MARK: - Properties
     lazy private var imageView: UIImageView = {
         var imageView = UIImageView()
         imageView.contentMode = .scaleToFill
@@ -41,6 +42,7 @@ class PaidViewController: UIViewController {
         return button
     }()
     
+    //MARK: - Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
@@ -48,6 +50,7 @@ class PaidViewController: UIViewController {
         setNavigationBar()
     }
     
+    //MARK: - Setup
     private func setupUI() {
         
         self.view.backgroundColor = .white
@@ -81,6 +84,7 @@ class PaidViewController: UIViewController {
         }
     }
     
+    //MARK: - Configurations
     private func setupData() {
         
         self.imageView.image = UIImage(named: "party_popper_icon")
@@ -103,7 +107,7 @@ class PaidViewController: UIViewController {
         }
     }
     
-    
+    //MARK: - Actions
     @objc private func backButtonTapped() {
         self.navigationController?.popViewController(animated: true)
     }

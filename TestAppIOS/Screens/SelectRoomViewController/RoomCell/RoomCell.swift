@@ -9,14 +9,19 @@ import UIKit
 
 class RoomCell: UITableViewCell {
     
+    //MARK: - Properties
     var isSelectedCell: (() -> Void)?
     var moreButtonSend: (() -> Void)?
-    
+    private var images = [UIImage]()
+    private var maxImages = 0
+    private var imageIndex: Int = 0
     static var identifier = "RoomView"
     private var cellBackgroundView = UIView()
     
     lazy private var roomImage: UIImageView = {
         var imageView = UIImageView()
+        imageView.clipsToBounds = true
+        imageView.isUserInteractionEnabled = true
         imageView.layer.cornerRadius = 15
         imageView.contentMode = .scaleToFill
         return imageView
@@ -85,6 +90,7 @@ class RoomCell: UITableViewCell {
     
     lazy private var indicatorView = StateIndicatorView()
     
+    //MARK: - Init
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
@@ -92,12 +98,21 @@ class RoomCell: UITableViewCell {
         clearView.backgroundColor = .clear
         self.selectedBackgroundView = clearView
         self.contentView.isHidden = true
+        
+        let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(swiped)) // put : at the end of method name
+        swipeRight.direction = UISwipeGestureRecognizer.Direction.right
+        self.roomImage.addGestureRecognizer(swipeRight)
+        
+        let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(swiped)) // put : at the end of method name
+        swipeLeft.direction = UISwipeGestureRecognizer.Direction.left
+        self.roomImage.addGestureRecognizer(swipeLeft)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    //MARK: - Setup
     func setupUI() {
         self.cellBackgroundView.backgroundColor = .white
         self.cellBackgroundView.layer.cornerRadius = 12
@@ -124,6 +139,7 @@ class RoomCell: UITableViewCell {
             make.top.equalTo(cellBackgroundView.snp.top).inset(16)
             make.left.equalTo(cellBackgroundView.snp.left).inset(16)
             make.right.equalTo(cellBackgroundView.snp.right).inset(16)
+            make.height.equalTo(257)
         }
         
         indicatorView.snp.makeConstraints { make in
@@ -176,20 +192,80 @@ class RoomCell: UITableViewCell {
         }
     }
     
-    func setupData(model: RoomlModel){
-        self.roomImage.image = UIImage(named: model.image)
-        self.typeLabel.text = model.type
-        self.allInclusiveLabel.text = model.allInclusive
-        self.optionsLabel.text = model.option
-        self.priceLabel.text = "от \(model.price) ₽"
-        self.conditionsLabel.text = model.conditions
+    //MARK: - Configurations
+    func setupData(model: Room) {
+        
+        for imageUrl in model.imageUrls {
+            NetworkService.shared.getImage(imageURL: imageUrl) { response in
+                guard let image = response else { return }
+                self.images.append(image)
+                self.maxImages = self.images.count - 1
+                self.indicatorView.setupUI(circleCount: self.images.count)
+                if let firstImage = self.images.first {
+                    self.roomImage.image = firstImage
+                }
+                
+                if self.images.count <= 1 {
+                    self.indicatorView.isHidden = true
+                } else {
+                    self.indicatorView.isHidden = false
+                }
+                
+            } failureBlock: { error in
+                print(error)
+            }
+        }
+        
+        let price = model.price.formattedWithSpaces()
+        self.typeLabel.text = model.name
+        self.allInclusiveLabel.text = model.peculiarities[0]
+        self.optionsLabel.text = model.peculiarities[1]
+        self.priceLabel.text = "от \(price) ₽"
+        self.conditionsLabel.text = model.pricePer
+        
     }
-    
+    //MARK: - Actions
     @objc private func selectAction() {
         isSelectedCell?()
     }
     
     @objc private func moreButtonAction() {
         moreButtonSend?()
+    }
+    
+    @objc func swiped(gesture: UIGestureRecognizer) {
+        if let swipeGesture = gesture as? UISwipeGestureRecognizer {
+            switch swipeGesture.direction {
+            case UISwipeGestureRecognizer.Direction.right:
+                imageIndex -= 1
+                if imageIndex < 0 {
+                    imageIndex = maxImages
+                }
+                UIView.transition(with: self.roomImage,
+                                  duration: 0.3,
+                                  options: .transitionCrossDissolve,
+                                  animations: {
+                    self.indicatorView.updateAccent(at: self.imageIndex)
+                    self.roomImage.image = self.images[self.imageIndex]
+                },
+                                  completion: nil)
+            case UISwipeGestureRecognizer.Direction.left:
+                imageIndex += 1
+                if imageIndex > maxImages {
+                    imageIndex = 0
+                }
+                
+                UIView.transition(with: self.roomImage,
+                                  duration: 0.3,
+                                  options: .transitionCrossDissolve,
+                                  animations: {
+                    self.indicatorView.updateAccent(at: self.imageIndex)
+                    self.roomImage.image = self.images[self.imageIndex]
+                },
+                                  completion: nil)
+            default:
+                break
+            }
+        }
     }
 }

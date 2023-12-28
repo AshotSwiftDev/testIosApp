@@ -9,6 +9,7 @@ import UIKit
 
 class FlightInformationView: UIView {
     
+    // MARK: - Properties
     lazy private var departureLabel: UILabel = {
         let label = UILabel()
         label.textColor = .textGray
@@ -39,14 +40,14 @@ class FlightInformationView: UIView {
         return label
     }()
     
-    lazy private var datesLabel: UILabel = {
+    lazy private var tourDateLabel: UILabel = {
         let label = UILabel()
         label.textColor = .textGray
         label.font = .sfProDispalyRegular(size: 16)
         return label
     }()
     
-    lazy private var datesInfoLabel: UILabel = {
+    lazy private var tourDateInfoLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 0
         label.textColor = .black
@@ -115,6 +116,7 @@ class FlightInformationView: UIView {
         return label
     }()
     
+    //MARK: - Init
     init() {
         super.init(frame: .zero)
         setupUI()
@@ -124,6 +126,7 @@ class FlightInformationView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    //MARK: - Setup
     private func setupUI() {
         
         self.backgroundColor = .white
@@ -133,8 +136,8 @@ class FlightInformationView: UIView {
         self.addSubview(departureInfoLabel)
         self.addSubview(arrivalLabel)
         self.addSubview(arrivalInfoLabel)
-        self.addSubview(datesLabel)
-        self.addSubview(datesInfoLabel)
+        self.addSubview(tourDateLabel)
+        self.addSubview(tourDateInfoLabel)
         self.addSubview(numberOfNightsLabel)
         self.addSubview(numberOfNightsInfoLabel)
         self.addSubview(hotelNameLabel)
@@ -166,20 +169,20 @@ class FlightInformationView: UIView {
             make.right.equalTo(self.snp.right).inset(16)
         }
         
-        datesLabel.snp.makeConstraints { make in
+        tourDateLabel.snp.makeConstraints { make in
             make.top.equalTo(arrivalInfoLabel.snp.bottom).inset(-16)
             make.left.equalTo(arrivalLabel.snp.left)
         }
         
-        datesInfoLabel.snp.makeConstraints { make in
-            make.top.equalTo(datesLabel.snp.top)
+        tourDateInfoLabel.snp.makeConstraints { make in
+            make.top.equalTo(tourDateLabel.snp.top)
             make.left.equalTo(self.snp.left).inset(156)
             make.right.equalTo(self.snp.right).inset(16)
         }
         
         numberOfNightsLabel.snp.makeConstraints { make in
-            make.top.equalTo(datesInfoLabel.snp.bottom).inset(-16)
-            make.left.equalTo(datesLabel.snp.left)
+            make.top.equalTo(tourDateInfoLabel.snp.bottom).inset(-16)
+            make.left.equalTo(tourDateLabel.snp.left)
         }
         
         numberOfNightsInfoLabel.snp.makeConstraints { make in
@@ -223,20 +226,23 @@ class FlightInformationView: UIView {
         }
     }
     
+    //MARK: - Configurations
     func setupData(model: BookingModel) {
-        self.departureLabel.text = "Вылет из"
-        self.departureInfoLabel.text = model.departureInfo
-        self.arrivalLabel.text = "Страна, город"
-        self.arrivalInfoLabel.text = model.arrivalIInfo
-        self.datesLabel.text = "Даты"
-        self.datesInfoLabel.text = model.dateInfo
-        self.numberOfNightsLabel.text = "Кол-во ночей"
-        self.numberOfNightsInfoLabel.text = model.numberOfNightsInfo
-        self.hotelNameLabel.text = "Отель"
-        self.hotelNameInfoLabel.text = model.hotelNameInfo
-        self.roomLabel.text = "Номер"
-        self.roomInfoLabel.text = model.roomInfo
-        self.nutritionLabel.text = "Питание"
-        self.nutritionInfoLabel.text = model.nutritionInfo
+        DispatchQueue.main.async {
+            self.departureLabel.text = "Вылет из"
+            self.departureInfoLabel.text = model.departure
+            self.arrivalLabel.text = "Страна, город"
+            self.arrivalInfoLabel.text = model.arrivalCountry
+            self.tourDateLabel.text = "Даты"
+            self.tourDateInfoLabel.text = "\( model.tourDateStart) - \( model.tourDateStop)"
+            self.numberOfNightsLabel.text = "Кол-во ночей"
+            self.numberOfNightsInfoLabel.text = "\(model.numberOfNights)"
+            self.hotelNameLabel.text = "Отель"
+            self.hotelNameInfoLabel.text = model.hotelName
+            self.roomLabel.text = "Номер"
+            self.roomInfoLabel.text = model.room
+            self.nutritionLabel.text = "Питание"
+            self.nutritionInfoLabel.text = model.nutrition
+        }
     }
 }

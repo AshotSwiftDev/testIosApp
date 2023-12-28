@@ -60,8 +60,9 @@ enum ViewType {
 
 class OptionView: UIView {
     
-   private var viewType: ViewType
-   var optionButtonTapped:((_ sender: UIButton, _ type: ViewType) -> Void)?
+    // MARK: - Properties
+    var optionButtonTapped:((_ sender: UIButton, _ type: ViewType) -> Void)?
+    private var viewType: ViewType
     
     lazy private var catecoryImageView: UIImageView = {
         let imageView = UIImageView()
@@ -101,6 +102,7 @@ class OptionView: UIView {
         return view
     }()
     
+    // MARK: - Init
     init(viewType: ViewType) {
         self.viewType = viewType
         super.init(frame: .zero)
@@ -108,13 +110,14 @@ class OptionView: UIView {
         setupUI()
         
         viewTappedButton.addTarget(self, action: #selector(optionTypeButtonAction(_:)), for: .touchUpInside)
-     
+        
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Setup
     private func setupUI() {
         
         self.catecoryImageView.image = self.viewType.image
@@ -157,6 +160,7 @@ class OptionView: UIView {
         }
     }
     
+    // MARK: - Actions
     @objc private func optionTypeButtonAction(_ sender: UIButton) {
         optionButtonTapped?(viewTappedButton, viewType)
     }

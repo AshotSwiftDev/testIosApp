@@ -8,6 +8,7 @@ import UIKit
 
 class PriceInfoView: UIView {
     
+    //MARK: - Properties
     lazy private var tourLabel: UILabel = {
         let label = UILabel()
         label.textColor = .textGray
@@ -63,11 +64,12 @@ class PriceInfoView: UIView {
     lazy private var toPayInfoLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 0
-        label.textColor = .black
-        label.font = .sfProDispalyRegular(size: 16)
+        label.textColor = .textBlue
+        label.font = .sfProDispalySemibold(size: 16)
         return label
     }()
     
+    //MARK: - Init
     init() {
         super.init(frame: .zero)
         setupUI()
@@ -77,6 +79,7 @@ class PriceInfoView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    //MARK: - Setup
     private func setupUI() {
         self.backgroundColor = .white
         self.layer.cornerRadius = 15
@@ -131,14 +134,22 @@ class PriceInfoView: UIView {
         }
     }
     
+    //MARK: - Configurations
     func setupData(model: BookingModel) {
-        self.tourLabel.text = "Тур"
-        self.tourInfoLabel.text = "\(model.tourInfo) ₽"
-        self.fuelSurchargeLabel.text = "Топливный сбор"
-        self.fuelSurchargeInfoLabel.text = "\(model.fuelSurchargeInfo) ₽"
-        self.serviceFeeLabel.text = "Сервисный сбор"
-        self.serviceFeeInfoLabel.text = "\(model.serviceFeeInfo) ₽"
-        self.toPayLabel.text = "К оплате"
-        self.toPayInfoLabel.text = "\(model.toPayInfo) ₽"
+        DispatchQueue.main.async {
+            let tourPrice = model.tourPrice.formattedWithSpaces()
+            let fuelCharge = model.fuelCharge.formattedWithSpaces()
+            let serviceCharge = model.serviceCharge.formattedWithSpaces()
+            let toPay = model.tourPrice + model.fuelCharge + model.serviceCharge
+            let toPayPrice = toPay.formattedWithSpaces()
+            self.tourLabel.text = "Тур"
+            self.tourInfoLabel.text = "\(tourPrice) ₽"
+            self.fuelSurchargeLabel.text = "Топливный сбор"
+            self.fuelSurchargeInfoLabel.text = "\(fuelCharge) ₽"
+            self.serviceFeeLabel.text = "Сервисный сбор"
+            self.serviceFeeInfoLabel.text = "\(serviceCharge) ₽"
+            self.toPayLabel.text = "К оплате"
+            self.toPayInfoLabel.text = "\(toPayPrice) ₽"
+        }
     }
 }

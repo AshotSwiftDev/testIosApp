@@ -10,7 +10,9 @@ import SnapKit
 
 class HomeViewController: UIViewController {
     
-    let hotel = FetchHotel.shared.getHotels()
+    //MARK: - Properties
+    private var hotel: HotelModel?
+    
     private var topView = TopView()
     private var bottomView = BottomView()
     
@@ -37,11 +39,25 @@ class HomeViewController: UIViewController {
         return button
     }()
     
+    //MARK: - Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        getHotel()
         bottomView.delegate = self
         setupUI()
         setNavigationBar()
+    }
+    
+    //MARK: - Setup
+    func getHotel() {
+        NetworkService.shared.getHotels { responseHotel in
+            self.hotel = responseHotel
+            guard let hotel = self.hotel else { return }
+            self.topView.setupData(model: hotel)
+            self.bottomView.setupData(model: hotel)
+        } failureBlock: { error in
+            print(error)
+        }
     }
     
     private func setupUI() {
@@ -85,33 +101,27 @@ class HomeViewController: UIViewController {
             make.right.equalTo(selectButtonBackgroundView.snp.right).inset(16)
             make.bottom.equalTo(selectButtonBackgroundView.snp.bottom).inset(28)
         }
-        
-        topView.setupData(model: hotel)
-        bottomView.setupData(model: hotel)
     }
     
-    @objc private func selectAction() {
-        
-        if let firstHotel = FetchHotel.shared.getHotels().first,
-           let roomInfo = FetchHotel.shared.getRoomInfo(forHotel: firstHotel) {
-            // Передайте roomInfo в RoomViewController
-            let roomViewController = SelectRoomViewController()
-            roomViewController.rooms = roomInfo
-            navigationController?.pushViewController(roomViewController, animated: true)
-        }
-    }
-    
-   private func setNavigationBar() {
+    // MARK: - Configurations
+    private func setNavigationBar() {
         self.navigationItem.title = "Отель"
-
+        
         if let navigationBar = self.navigationController?.navigationBar {
             navigationBar.tintColor = .black
             navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.black,
                                                  NSAttributedString.Key.font: UIFont.sfProDispalyMedium(size: 18)]
         }
     }
+    
+    // MARK: - Actions
+    @objc private func selectAction() {
+        let roomViewController = SelectRoomViewController()
+        navigationController?.pushViewController(roomViewController, animated: true)
+    }
 }
 
+// MARK: - Extansions
 extension HomeViewController: OptionViewDelegate {
     func amenitiesButtonTapped(sender: UIButton) {
         print("amenitiesButtonTapped")

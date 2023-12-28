@@ -16,6 +16,7 @@ protocol OptionViewDelegate: HomeViewController {
 
 class BottomView: UIView {
     
+    // MARK: - Properties
     weak var delegate: OptionViewDelegate?
     private var amenitiesView = OptionView(viewType: .amenities)
     private var includedView = OptionView(viewType: .included)
@@ -61,7 +62,7 @@ class BottomView: UIView {
         return label
     }()
     
-    lazy private var hotelInfoLabel: UILabel = {
+    lazy private var aboutTheHotelLabel: UILabel = {
         let label = UILabel()
         label.textColor = .black
         label.numberOfLines = 0
@@ -76,6 +77,7 @@ class BottomView: UIView {
         return view
     }()
     
+    // MARK: - Init
     init() {
         super.init(frame: .zero)
         setupUI()
@@ -88,8 +90,9 @@ class BottomView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-     private func setupUI() {
-         
+    // MARK: - Setup
+    private func setupUI() {
+        
         self.layer.cornerRadius = 12
         self.backgroundColor = .white
         self.addSubview(aboutTheHotel)
@@ -97,7 +100,7 @@ class BottomView: UIView {
         self.addSubview(wifiInfoLabel)
         self.addSubview(distanceToAirportLabel)
         self.addSubview(distanceToTheBeachLabel)
-        self.addSubview(hotelInfoLabel)
+        self.addSubview(aboutTheHotelLabel)
         self.addSubview(containerView)
         
         let dividerTop = DividerView()
@@ -105,7 +108,7 @@ class BottomView: UIView {
         self.addSubview(dividerTop)
         self.addSubview(dividerBottom)
         
-      
+        
         containerView.addSubview(amenitiesView)
         containerView.addSubview(includedView)
         containerView.addSubview(notIncludedView)
@@ -121,12 +124,12 @@ class BottomView: UIView {
         }
         
         wifiInfoLabel.snp.makeConstraints { make in
-            make.centerY.equalTo(lineInfoLabel.snp.centerY)
-            make.left.equalTo(lineInfoLabel.snp.right).inset(-8)
+            make.top.equalTo(lineInfoLabel.snp.bottom).inset(-8)
+            make.left.equalTo(lineInfoLabel.snp.left)
         }
         
         distanceToAirportLabel.snp.makeConstraints { make in
-            make.top.equalTo(lineInfoLabel.snp.bottom).inset(-8)
+            make.top.equalTo(wifiInfoLabel.snp.bottom).inset(-8)
             make.left.equalTo(lineInfoLabel.snp.left)
         }
         
@@ -135,7 +138,7 @@ class BottomView: UIView {
             make.left.equalTo(distanceToAirportLabel.snp.right).inset(-8)
         }
         
-        hotelInfoLabel.snp.makeConstraints { make in
+        aboutTheHotelLabel.snp.makeConstraints { make in
             make.top.equalTo(distanceToAirportLabel.snp.bottom).inset(-12)
             make.left.equalTo(self.snp.left).inset(16)
             make.right.equalTo(self.snp.right).inset(16)
@@ -143,7 +146,7 @@ class BottomView: UIView {
         
         containerView.snp.makeConstraints { make in
             make.height.equalTo(184)
-            make.top.equalTo(hotelInfoLabel.snp.bottom).inset(-18)
+            make.top.equalTo(aboutTheHotelLabel.snp.bottom).inset(-18)
             make.left.equalTo(self.snp.left).inset(16)
             make.right.equalTo(self.snp.right).inset(16)
             make.bottom.equalTo(self.snp.bottom).inset(16)
@@ -185,14 +188,14 @@ class BottomView: UIView {
         }
     }
     
-    func setupData(model: [HotelModel]){
-        for hotel in model {
-            self.lineInfoLabel.text = hotel.lineInfo
-            self.wifiInfoLabel.text = hotel.wifiInfo
-            self.distanceToAirportLabel.text = hotel.distanceToAirport
-            self.distanceToTheBeachLabel.text = hotel.distanceToTheBeach
-            self.hotelInfoLabel.text = hotel.hotelInfo
-        }
+    // MARK: - Configurations
+    func setupData(model: HotelModel){
+        
+        self.lineInfoLabel.text = model.aboutTheHotel.peculiarities[1]
+        self.wifiInfoLabel.text = model.aboutTheHotel.peculiarities[0]
+        self.distanceToAirportLabel.text = model.aboutTheHotel.peculiarities[2]
+        self.distanceToTheBeachLabel.text = model.aboutTheHotel.peculiarities[3]
+        self.aboutTheHotelLabel.text = model.aboutTheHotel.description
     }
     
     private func buttonTapped(sender: UIButton, _ type: ViewType) {

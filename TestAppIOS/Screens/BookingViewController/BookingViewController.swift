@@ -10,14 +10,15 @@ import SnapKit
 
 class BookingViewController: UIViewController {
     
-   private var index = 0
-   private let tourists = ["Первый турист", "Второй турист", "Третый турист", "Четвертый турист", "Пятый турист", "Шестой турист", "Седьмой турист", "восьмой турист", "Девятый турист", "десятый турист"]
-    
-    private var bookingModel = FetchBooking.shared.getBookingList()
+    //MARK: - Properties
+    private let tourists = ["Первый турист", "Второй турист", "Третый турист", "Четвертый турист", "Пятый турист", "Шестой турист", "Седьмой турист", "Восьмой турист", "Девятый турист", "Десятый турист"]
+    private var booking: BookingModel?
+    private var index = 0
     private var ratingView = RatingView()
     private var flightInformationView = FlightInformationView()
     private var sectionView = SectionView()
     private var priceInfoView = PriceInfoView()
+    private var buyerInfoView = BuyerInfoView()
     private var scrollViewBottomConstraint: Constraint?
     
     lazy private var scrollView: UIScrollView = {
@@ -38,7 +39,6 @@ class BookingViewController: UIViewController {
         stackView.spacing = 8
         stackView.axis = .vertical
         return stackView
-        
     }()
     
     lazy private var payButton: UIButton = {
@@ -73,6 +73,7 @@ class BookingViewController: UIViewController {
         return button
     }()
     
+    //MARK: - Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setNavigationBar()
@@ -80,6 +81,15 @@ class BookingViewController: UIViewController {
         setupData()
     }
     
+    func getBooking() {
+        NetworkService.shared.getBooking { bookingResponce in
+            self.booking = bookingResponce
+        } failureBlock: { error in
+            print(error)
+        }
+    }
+    
+    //MARK: - Setup
     private func setupUI() {
         
         self.ratingView.layer.cornerRadius = 15
@@ -88,6 +98,7 @@ class BookingViewController: UIViewController {
         self.view.addSubview(payButtonBackgroundView)
         self.scrollView.addSubview(ratingView)
         self.scrollView.addSubview(flightInformationView)
+        self.scrollView.addSubview(buyerInfoView)
         self.scrollView.addSubview(stackView)
         self.scrollView.addSubview(priceInfoView)
         self.scrollView.addSubview(addBayerButtonBackgroundView)
@@ -115,8 +126,14 @@ class BookingViewController: UIViewController {
             make.right.equalTo(view.snp.right)
         }
         
-        stackView.snp.makeConstraints { make in
+        buyerInfoView.snp.makeConstraints { make in
             make.top.equalTo(flightInformationView.snp.bottom).inset(-8)
+            make.left.equalTo(view.snp.left)
+            make.right.equalTo(view.snp.right)
+        }
+        
+        stackView.snp.makeConstraints { make in
+            make.top.equalTo(buyerInfoView.snp.bottom).inset(-8)
             make.left.equalTo(view.snp.left)
             make.right.equalTo(view.snp.right)
         }
@@ -147,7 +164,6 @@ class BookingViewController: UIViewController {
         }
         
         payButtonBackgroundView.snp.makeConstraints { make in
-            make.top.equalTo(scrollView.snp.bottom)
             make.width.equalTo(view.snp.width)
             make.bottom.equalTo(view.snp.bottom)
         }
@@ -161,15 +177,27 @@ class BookingViewController: UIViewController {
         }
     }
     
+    // MARK: - Configrurations
     private func setupData() {
-        addBayerLabel.text = "Добавить туриста"
-        ratingView.setupData(rating: "5 Превосходно", name: "Steigenberger Makadi", description: "Madinat Makadi, Safaga Road, Makadi Bay, Египет")
-        flightInformationView.setupData(model: bookingModel)
-        priceInfoView.setupData(model: bookingModel)
-        registerKeyboardNotification()
-        sectionView.setupData(title: "Первый турист")
         
-        self.payButton.setTitle("Оплатить \(bookingModel.tourInfo)", for: .normal)
+        NetworkService.shared.getBooking{ responseHotel in
+            self.booking = responseHotel
+            guard let booking = self.booking else { return }
+            DispatchQueue.main.async {
+                self.addBayerLabel.text = "Добавить туриста"
+                
+                self.ratingView.setupData(rating: "\(booking.horating)", ratingName: booking.ratingName, name: booking.hotelName, hotelAdress: booking.hotelAdress)
+                self.flightInformationView.setupData(model: booking)
+                self.priceInfoView.setupData(model: booking)
+                self.registerKeyboardNotification()
+                self.sectionView.setupData(title: "Первый турист")
+                let toPay = booking.tourPrice + booking.fuelCharge + booking.serviceCharge
+                let toPayPrice = toPay.formattedWithSpaces()
+                self.payButton.setTitle("Оплатить \(toPayPrice) ₽", for: .normal)
+            }
+        } failureBlock: { error in
+            print(error.localizedDescription)
+        }
     }
     
     private func setNavigationBar() {
@@ -187,7 +215,7 @@ class BookingViewController: UIViewController {
         }
     }
     
-    
+    // MARK: - Actions
     @objc private func backButtonTapped() {
         self.navigationController?.popViewController(animated: true)
     }
@@ -204,7 +232,7 @@ class BookingViewController: UIViewController {
     }
     
     @objc private func addBayerAction() {
- 
+        
         self.index += 1
         if index < tourists.count {
             let sectionView = SectionView()
@@ -236,6 +264,7 @@ class BookingViewController: UIViewController {
     }
 }
 
+// MARK: - Extansions
 extension BookingViewController: UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
         scrollView.setContentOffset(CGPoint(x: 0, y: stackView.frame.origin.y - scrollView.contentInset.top), animated: true)

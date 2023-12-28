@@ -9,6 +9,7 @@ import UIKit
 
 class RatingView: UIView {
     
+    // MARK: - Properties
     lazy private var ratingView: UIView = {
         let view = UIView()
         view.backgroundColor = .ratingBackground
@@ -31,11 +32,12 @@ class RatingView: UIView {
     lazy private var nameLabel: UILabel = {
         let label = UILabel()
         label.textColor = .black
+        label.numberOfLines = 0
         label.font = .sfProDispalyMedium(size: 22)
         return label
     }()
     
-    lazy private var descriptionLabel: UILabel = {
+    lazy private var hotelAdressLabel: UILabel = {
         let label = UILabel()
         label.textColor = .textBlue
         label.numberOfLines = 2
@@ -43,6 +45,7 @@ class RatingView: UIView {
         return label
     }()
     
+    // MARK: - Init
     init() {
         super.init(frame: .zero)
         setupUI()
@@ -52,13 +55,14 @@ class RatingView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Setup
     func  setupUI() {
         self.backgroundColor = .white
         self.addSubview(ratingView)
         self.ratingView.addSubview(ratingImage)
         self.ratingView.addSubview(ratingLabel)
         self.addSubview(nameLabel)
-        self.addSubview(descriptionLabel)
+        self.addSubview(hotelAdressLabel)
         
         ratingView.snp.makeConstraints { make in
             make.top.equalTo(self.snp.top).inset(16)
@@ -81,19 +85,24 @@ class RatingView: UIView {
         nameLabel.snp.makeConstraints { make in
             make.top.equalTo(ratingView.snp.bottom).inset(-8)
             make.left.equalTo(ratingView.snp.left)
+            make.right.equalTo(self.snp.right)
+            
         }
         
-        descriptionLabel.snp.makeConstraints { make in
+        hotelAdressLabel.snp.makeConstraints { make in
             make.top.equalTo(nameLabel.snp.bottom).inset(-8)
             make.left.equalTo(nameLabel.snp.left)
             make.bottom.equalTo(self.snp.bottom).inset(16)
         }
     }
     
-    func setupData(rating: String, name: String, description: String) {
-        self.ratingImage.image = UIImage(named: "rating_star_icon")
-        self.ratingLabel.text = rating
-        self.nameLabel.text = name
-        self.descriptionLabel.text = description
+    // MARK: - Configurations
+    func setupData(rating: String, ratingName: String, name: String, hotelAdress: String) {
+        DispatchQueue.main.async {
+            self.ratingImage.image = UIImage(named: "rating_star_icon")
+            self.ratingLabel.text = "\(rating) \(ratingName)"
+            self.nameLabel.text = name
+            self.hotelAdressLabel.text = hotelAdress
+        }
     }
 }

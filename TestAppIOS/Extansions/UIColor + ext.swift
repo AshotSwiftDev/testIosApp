@@ -16,8 +16,7 @@ extension UIColor {
     static let textGray = UIColor(named: "text_color_gray")
     static let textLigthGray = UIColor(named: "text_color_ligth_gray")
     static let textDark = UIColor(named: "text_color_dark")
-    static let separatorColor = UIColor(named: "separator_color")
+    static let separatorColor = UIColor(named: "separator_color_dark")
     static let blueOpacity = UIColor(named: "button_background_color")
     static let textFieldDarkGray = UIColor(named: "text_dark_gray")
-    
 }

@@ -9,7 +9,8 @@ import UIKit
 
 class SelectRoomViewController: UIViewController {
     
-    var rooms = [RoomlModel]()
+    //MARK: - Properties
+    private var rooms: [Room]?
     
     lazy private var tableView: UITableView = {
         let tableView = UITableView()
@@ -19,8 +20,10 @@ class SelectRoomViewController: UIViewController {
         return tableView
     }()
     
+    //MARK: - Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        getRooms()
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(RoomCell.self, forCellReuseIdentifier: RoomCell.identifier)
@@ -28,6 +31,21 @@ class SelectRoomViewController: UIViewController {
         setNavigationBar()
     }
     
+    func getRooms() {
+        NetworkService.shared.getRooms { [weak self] responseRoom in
+            guard let self = self else { return }
+            
+            // Perform UI-related tasks on the main thread
+            DispatchQueue.main.async {
+                self.rooms = responseRoom.rooms
+                self.tableView.reloadData()
+            }
+        } failureBlock: { error in
+            print(error.localizedDescription)
+        }
+    }
+    
+    //MARK: - Setup
     private func setupUI() {
         
         view.backgroundColor = .white
@@ -41,6 +59,7 @@ class SelectRoomViewController: UIViewController {
         }
     }
     
+    //MARK: - Configurations
     func setNavigationBar() {
         self.navigationItem.title =   "Steigenberger Makadi"
         let backButton = UIButton(type: .custom)
@@ -56,33 +75,39 @@ class SelectRoomViewController: UIViewController {
         }
     }
     
+    //MARK: - Actions
     @objc private func backButtonTapped() {
         self.navigationController?.popViewController(animated: true)
     }
 }
 
+//MARK: - Extansions
 extension SelectRoomViewController: UITableViewDelegate {
     
 }
 
 extension SelectRoomViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        rooms.count
+        guard let rooms = self.rooms else { return 0 }
+        return rooms.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: RoomCell.identifier, for: indexPath) as? RoomCell
-        let model = rooms[indexPath.item]
-        cell?.setupData(model: model)
-        cell?.isSelectedCell = { [weak self] in
-            let bookingViewController = BookingViewController()
-            self?.navigationController?.pushViewController(bookingViewController, animated: true)
-        }
         
-        cell?.moreButtonSend = { [weak self] in
-            print("moreButtonAction")
+        if let rooms = rooms {
+            
+            cell?.setupData(model: rooms[indexPath.row])
+            cell?.isSelectedCell = { [weak self] in
+                
+                let bookingViewController = BookingViewController()
+                self?.navigationController?.pushViewController(bookingViewController, animated: true)
+            }
+            
+            cell?.moreButtonSend = {
+                print("moreButtonAction")
+            }
         }
-        
         return cell ?? UITableViewCell()
     }
 }

@@ -9,7 +9,9 @@ import UIKit
 
 class SectionView: UIView {
     
-    private var isHiddenStackView = false {
+    //MARK: - Properties
+    private var isHiddenStackView = false
+    {
         didSet {
             updateViewHeight()
         }
@@ -40,7 +42,7 @@ class SectionView: UIView {
     
     lazy private var firstNameField: UIView = {
         let view = UITextFieldAnimateView()
-        view.setupTextField(placeholder: "Имя")
+        view.setupTextField(placeholder: "Имя", type: .normal)
         view.height = 70
         view.backgroundColor = .backgroundColor
         view.layer.cornerRadius = 10
@@ -49,7 +51,7 @@ class SectionView: UIView {
     
     lazy private var lastNameField: UIView = {
         let view = UITextFieldAnimateView()
-        view.setupTextField(placeholder: "Фамилия")
+        view.setupTextField(placeholder: "Фамилия", type: .normal)
         view.height = 70
         view.backgroundColor = .backgroundColor
         view.layer.cornerRadius = 10
@@ -58,7 +60,7 @@ class SectionView: UIView {
     
     lazy private var dateOfBirthField: UIView = {
         let view = UITextFieldAnimateView()
-        view.setupTextField(placeholder: "Дата рождения")
+        view.setupTextField(placeholder: "Дата рождения", type: .normal)
         view.height = 70
         view.backgroundColor = .backgroundColor
         view.layer.cornerRadius = 10
@@ -67,7 +69,7 @@ class SectionView: UIView {
     
     lazy private var citizenshipField: UIView = {
         let view = UITextFieldAnimateView()
-        view.setupTextField(placeholder: "Гражданство")
+        view.setupTextField(placeholder: "Гражданство", type: .normal)
         view.height = 70
         view.backgroundColor = .backgroundColor
         view.layer.cornerRadius = 10
@@ -76,7 +78,7 @@ class SectionView: UIView {
     
     lazy private var passNumberField: UIView = {
         let view = UITextFieldAnimateView()
-        view.setupTextField(placeholder: "Номер загранпаспорта")
+        view.setupTextField(placeholder: "Номер загранпаспорта", type: .normal)
         view.height = 70
         view.backgroundColor = .backgroundColor
         view.layer.cornerRadius = 10
@@ -85,13 +87,14 @@ class SectionView: UIView {
     
     lazy private var passVaildDateField: UIView = {
         let view = UITextFieldAnimateView()
-        view.setupTextField(placeholder: "Срок действия загранпаспорта")
+        view.setupTextField(placeholder: "Срок действия загранпаспорта", type: .normal)
         view.height = 70
         view.backgroundColor = .backgroundColor
         view.layer.cornerRadius = 10
         return view
     }()
     
+    //MARK: - Init
     init() {
         super.init(frame: .zero)
         setupUI()
@@ -101,6 +104,8 @@ class SectionView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    private var stackViewHeightConstraint: NSLayoutConstraint!
+    //MARK: - Setup
     private func setupUI() {
         
         self.backgroundColor = .white
@@ -126,9 +131,10 @@ class SectionView: UIView {
         }
         
         stackView.snp.makeConstraints { make in
-            make.top.equalTo(titleLabel.snp.bottom).inset(-16)
+            make.top.equalTo(titleLabel.snp.bottom).inset(-20)
             make.right.equalTo(self.snp.right).inset(16)
             make.left.equalTo(self.snp.left).inset(16)
+
         }
         
         self.snp.makeConstraints { make in
@@ -136,26 +142,27 @@ class SectionView: UIView {
         }
     }
     
+    //MARK: - Configurations
     func setupData(title: String) {
-        self.titleLabel.text = title
-    }
-    
-    private func updateViewHeight() {
-        UIView.animate(withDuration: 0.3) {
-            self.snp.updateConstraints { make in
-                make.height.equalTo(self.isHiddenStackView ? 430 : 58)
-            }
-            self.superview?.layoutIfNeeded()
+        DispatchQueue.main.async {
+            self.titleLabel.text = title
         }
     }
     
+    //MARK: - Update
+    private func updateViewHeight() {
+            self.snp.updateConstraints { make in
+                make.height.equalTo(self.isHiddenStackView ? 430 : 58)
+            }
+    }
+    
+    //MARK: - Actions
     @objc func showInfoButtonAction() {
         showInfoButton.isSelected.toggle()
         isHiddenStackView = !showInfoButton.isSelected
         if showInfoButton.isSelected {
             self.stackView.isHidden = true
             showInfoButton.setImage(UIImage(named: "chevron_down_icon"), for: .normal)
-            
         } else {
             self.stackView.isHidden = false
             showInfoButton.setImage(UIImage(named: "chevron_up_icon"), for: .normal)

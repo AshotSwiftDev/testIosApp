@@ -7,11 +7,24 @@
 
 import Foundation
 
-struct RoomlModel {
-    var image: String
-    var type: String
-    var allInclusive: String
-    var option: String
-    var price: String
-    var conditions: String
+// MARK: - RoomModel
+struct RoomModel: Codable {
+    let rooms: [Room]
+}
+
+// MARK: - Room
+struct Room: Codable {
+    let id: Int
+    let name: String
+    let price: Int
+    let pricePer: String
+    let peculiarities: [String]
+    let imageUrls: [String]
+
+    enum CodingKeys: String, CodingKey {
+        case id, name, price
+        case pricePer = "price_per"
+        case peculiarities
+        case imageUrls = "image_urls"
+    }
 }

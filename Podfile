@@ -7,6 +7,7 @@ target 'TestAppIOS' do
 
   # Pods for TestAppIOS
  pod 'SnapKit'
+ pod 'Alamofire' 
 
   target 'TestAppIOSTests' do
     inherit! :search_paths

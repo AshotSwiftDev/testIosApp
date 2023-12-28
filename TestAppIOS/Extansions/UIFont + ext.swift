@@ -25,5 +25,4 @@ extension UIFont {
     static func sfProDispalySemibold(size: CGFloat) -> UIFont {
         return UIFont(name: "SFProDisplay-Semibold", size: size) ?? .systemFont(ofSize: size)
     }
-        
 }
